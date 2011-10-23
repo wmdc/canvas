@@ -179,7 +179,7 @@ private:
 		}
 	}
 
-	void addSelectedMotion( unsigned frame );
+	Motion *createMotionFromSelection() const;
 
 	void setPlaybackFrame( unsigned frame, bool showNewFrame = true );
 };

@@ -22,7 +22,7 @@ public:
 
 	/* Appends the given motion to the end of this motion. */
 	void operator +=(const Motion &appendMotion);
-	void operator +=(const Motion *appendMotion) { operator +=(*appendMotion); }
+	void operator +=(const Motion *appendMotion) { if( appendMotion) operator +=(*appendMotion); }
 
 	
 	void draw( unsigned frame, bool applyTranslation = true ) const; /* Draw a frame of animation */

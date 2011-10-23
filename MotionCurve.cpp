@@ -207,7 +207,19 @@ void MotionCurve::mouseDown( int button, Point2D p, bool doubleClick ) {
 		} else {
 			//highlight some part of the motion
 			if( ( frame >= highlightFrame && frame <= highlightEndFrame ) || ( frame <= highlightFrame && frame >= highlightEndFrame ) ) {
-				addSelectedMotion( frame );
+				Motion *m = createMotionFromSelection();
+
+				//THIS CREATES A MEMORY LEAK! Don't care for now, but is there a good way to improve this design?
+				if( button == 1 )
+				{
+				    canvas.animate(*m);
+				}
+				else
+				{
+					canvas.addMotion(m);
+					clearGraphSelection();
+				}
+
 			} else {
 				clearGraphSelection();
 
@@ -217,35 +229,15 @@ void MotionCurve::mouseDown( int button, Point2D p, bool doubleClick ) {
 				updateHighlightIndices();
 				selecting = true;
                 flagSelected = true;
-/*
-				//extending the selection range
-				MotionCurve *before = neighbourSelectedBefore();
-				MotionCurve *after = neighbourSelectedAfter();
-
-				if( before && !after ) {
-                    highlightFrame = 0;
-					highlightEndFrame = frame;
-				} else if( after && !before ) {
-					highlightFrame = frame;
-					highlightEndFrame = motion.getFrameCount();
-				} else if( !after && !before ) {
-					//no selection currently
-					highlightFrame = frame;
-					highlightEndFrame = frame;
-				} else {
-					highlightFrame = 0;
-					highlightEndFrame = motion.getFrameCount();
-				}
-				updateHighlightIndices();
-				selecting = true;
-                flagSelected = true; */
 			}
 		}
 	}
 }
+
 void MotionCurve::mouseUp( int button, Point2D p ) {
 	selecting = false;
 }
+
 void MotionCurve::mouseMove( Point2D p ) {
 	if( canvas.gotMouseOver() || !curve.contains( p ) ) {
 		// if another control already responded to mouse over or this curve is not involved.
@@ -296,49 +288,36 @@ void MotionCurve::mouseMove( Point2D p ) {
 	}
 }
 
-void MotionCurve::addSelectedMotion( unsigned frame ) {
-	if( highlightFrame > 0 && highlightEndFrame < motion.getFrameCount() - 1 ) {
-		// only this curve is involved
-		canvas.addMotion( new Motion( motion, highlightFrame, highlightEndFrame ), true );
-		clearGraphSelection();
-		return;
-	} else {
-	    // traverse the motion graph
-		MotionCurve *cur = this;
+Motion *MotionCurve::createMotionFromSelection() const {
+	//traverse the motion graph.
+	//note: there is no check for cycles here!
 
-		while( cur->neighbourSelectedBefore() ) { // find the first motion curve
-			cur = cur->neighbourSelectedBefore();
-		}
+	const MotionCurve *cur = this;
 
-        // loop to the last motion curve
-		Motion *result = 0;
-		do {
-			Motion *m = new Motion(*cur->getMotion(), cur->getHighlightFrame(), cur->getHighlightEndFrame());
-
-			if( m == NULL ) {
-				fprintf(stderr, "Warning: MotionCurve::addSelectedMotion tried to get a null motion's selection!\n");
-				clearGraphSelection();
-				return;
-			}
-
-			result ? *result += m : result = m;
-
-			cur = cur->neighbourSelectedAfter();
-		} while( cur );
-
-		if( result ) {
-			mAdd = result;
-			tAdd = clock();
-
-			highlightFrame = frame;
-			updateHighlightIndices();
-			pAdd = curve[highlightEndIndex];
-
-			canvas.addMotion( result );
-		}
-
-		clearGraphSelection();
+	while( cur->neighbourSelectedBefore() )
+	{
+		cur = cur->neighbourSelectedBefore();
 	}
+
+	Motion *result = NULL;
+
+	while(cur)
+	{
+		Motion *m = new Motion(*cur->getMotion(), cur->getHighlightFrame(), cur->getHighlightEndFrame());
+
+		if(result == NULL)
+		{
+			result = m;
+		}
+		else if(m)
+		{
+			*result += m;
+		}
+
+		cur = cur->neighbourSelectedAfter();
+	}
+
+	return result;
 }
 
 void MotionCurve::setPlaybackFrame( unsigned frame, bool showNewFrame ) {
@@ -361,7 +340,7 @@ void MotionCurve::setPlaybackFrame( unsigned frame, bool showNewFrame ) {
 	playbackSegEnd.y = playbackSeg.y + ( playbackSegEnd.y - playbackSeg.y ) * scale;
 
     //display the figure on the canvas
-	if( showNewFrame ) {
+	if( !canvas.isAnimating() && showNewFrame ) {
 	  canvas.animate( motion, false, frame, frame );
 	}
 }
