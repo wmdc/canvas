@@ -97,6 +97,8 @@ public:
 	Motion *getDrawingMotion() const {
 		return drawingMotion;
 	}
+
+	bool isAnimating() const;
 	/* Begin an animation */
 	void animate( Motion &clip, bool repeat = false );
 	void animate( Motion &clip, bool repeat, int startFrame, int endFrame );
@@ -211,7 +213,9 @@ private:
 	Motion *playbackClip;
 	Point2D *playbackOrigin;
 	int playbackFrame;
+
 	clock_t startTime;
+	float runTime;
 
 	Point2D dOrigin, pLast;
 

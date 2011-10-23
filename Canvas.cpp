@@ -38,6 +38,8 @@ Canvas::Canvas( vector<Motion *> initialMotions ) {
 
 	dlGrid = 0;
 
+	runTime = 0;
+
 	//set up the control palette
 	controlPalette = new BrushPalette( 984, 730, 156, 50, *this, false );
 	controlPalette->add( new ControlBrush( Canvas::MODE_ANNOTATE, true, *this, *controlPalette ) );
@@ -54,14 +56,24 @@ Canvas::Canvas( vector<Motion *> initialMotions ) {
 	addViewport( new CanvasViewport( 20, 280, 500, 500, *this, true, false ) );
 }
 
+bool Canvas::isAnimating() const {
+	return clock() - startTime < runTime * 1000.0f;
+}
+
 /* Start animating a given motion clip somewhere on the canvas. */
 void Canvas::animate( Motion &clip, bool repeat ) {
+	startTime = clock();
+	runTime = clip.getRuntime();
+
 	for( unsigned i = 0; i < viewports.size(); i++ ) {
 		viewports[i]->animate( clip, repeat );
 	}
 }
 
 void Canvas::animate( Motion &clip, bool repeat, int startFrame, int endFrame ) {
+	startTime = clock();
+	runTime = clip.getFrameTime() * (endFrame - startFrame);
+
 	for( unsigned i = 0; i < viewports.size(); i++ ) {
 		viewports[i]->animate( clip, repeat, startFrame, endFrame );
 	}
