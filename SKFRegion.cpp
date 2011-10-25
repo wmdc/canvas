@@ -62,20 +62,20 @@ void SKFRegion::draw() {
 	}
 
     //Draw the selection curve and point.
-	if( !selectionPath.empty() ) {
-		glLineWidth( 5.0 );
-	    glPointSize( 5.0 );
-	    glColor3d( 0.5, 0.5, 0.5 );
+	if( !selectionPath.empty() && selectionPath.size() > 1 ) {
+		glLineWidth( 7.0 );
+	    glPointSize( 7.0 );
+	    glColor3d( 0.7, 0.7, 0.7 );
 	    selectionPath.drawGLVertices( GL_LINE_STRIP );
 	    selectionPath.drawGLVertices( GL_POINTS );
 
 		glColor3d( 1.0, 0.2, 0.2 );
 		selectionPath.drawGLVertices( GL_POINTS, selectionPath.size() - 1, selectionPath.size() - 1 );
+	}
 
-		//Draw the interpolated pose
-		if( displayPose ) {
-			displayPose->drawHighlight();
-		}
+	//Draw the interpolated pose
+	if( displayPose ) {
+		displayPose->drawHighlight();
 	}
 }
 
@@ -87,6 +87,7 @@ bool SKFRegion::contains( Point2D p ) const {
 void SKFRegion::mouseDown( int button, Point2D p, bool doubleClick ) {
 	if( contains( p ) ) {
 		dragging = true;
+
 		if( selectionPath.contains( p ) ) {
 			if( selectionPath.size() == 1 ) {
 				displayPose->setDragging();
@@ -109,6 +110,8 @@ void SKFRegion::mouseDown( int button, Point2D p, bool doubleClick ) {
 			selectionTimes.push_back( clock() );
 			//delete displayPose;
 			displayPose = new CanvasPose( *generatePose( p ), p, *canvas );
+
+			if( button == 1 ) drawingMotion = true;
 		}
 
 		canvas->displayPose( *displayPose );
@@ -117,17 +120,24 @@ void SKFRegion::mouseDown( int button, Point2D p, bool doubleClick ) {
 
 void SKFRegion::mouseUp( int button, Point2D p ) {
 	dragging = false;
+	drawingMotion = false;
 }
 
 void SKFRegion::mouseMove( Point2D p ) {
 	if( drawingBounds ) {
 		return;
-	} else if( !poses.empty() && dragging && contains( p ) && canvas->isDragging() ) {
+	}
+	
+	if( !drawingBounds && dragging )
+	{
+		displayPose = new CanvasPose( *generatePose( p ), p, *canvas );
+		canvas->displayPose( *displayPose );
+		//delete displayPose;
+	}
+
+	if( drawingMotion ) {//!poses.empty() && dragging && contains( p ) && canvas->isDragging() ) {
         selectionPath.push_back( p );
 		selectionTimes.push_back( clock() );
-		//delete displayPose;
-	    displayPose = new CanvasPose( *generatePose( p ), p, *canvas );
-		canvas->displayPose( *displayPose );
 	}
 }
 

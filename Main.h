@@ -1,6 +1,6 @@
 #pragma once
 
-
+#define ARMA_USE_LAPACK
 
 using namespace std;
 

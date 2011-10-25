@@ -221,7 +221,7 @@ void Motion::draw( unsigned frame, bool applyRoot ) const {
 	glLineWidth(3.0);
 
 	// Draw motion path
-	//if(!applyRoot)
+	/*//if(!applyRoot)
 	{
 		glColor4dv(COLOR_MOTION_PATH);
 		glBegin(GL_LINE_STRIP);
@@ -230,7 +230,7 @@ void Motion::draw( unsigned frame, bool applyRoot ) const {
 			glVertex3f(m_data[i*m_nchannels + 0], m_data[i*m_nchannels + 1], m_data[i*m_nchannels + 2]);
 		}
 		glEnd();
-	}//*/
+	}*/
 
 	glColor4dv(COLOR_MOTION);
 
@@ -238,14 +238,14 @@ void Motion::draw( unsigned frame, bool applyRoot ) const {
 	glLineWidth( 3.0 );
 
 	//Facing direction vector
-	glPushMatrix(); {
+	/*glPushMatrix(); {
 		glRotatef( getFacing( frame ), 0.0f, 1.0f, 0.0f );
 
 		glBegin( GL_LINES );
 		  glVertex3f(0.0f, 0.0f, 0.0f);
 		  glVertex3f(0.0f, 0.0f, 12.0f);
 		glEnd();
-	} glPopMatrix();
+	} glPopMatrix();*/
 
 	glPushMatrix(); {
 		m_root->draw(m_data + frame * m_nchannels);
