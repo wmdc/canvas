@@ -11,6 +11,9 @@ const float CanvasPose::CANVAS_POSE_RADIUS = 20.0f;
 CanvasPose::CanvasPose( Pose &pose, Point2D pt, Canvas &c, bool dragEnabled ) : 
     Pose( pose ), CanvasItem( c ), p( pt ), dragging(false), region(NULL) {
 
+		for(int i = 0; i < 6; i++)
+			data[i] = 0.0f;
+
         if( dragEnabled ) {
 			dragging = dragEnabled;
 			pLast = pt;
@@ -19,6 +22,9 @@ CanvasPose::CanvasPose( Pose &pose, Point2D pt, Canvas &c, bool dragEnabled ) :
 
 CanvasPose::CanvasPose( Motion &m, int frame, Point2D location, Canvas &c, bool dragEnabled ) : 
     Pose( m, frame ), CanvasItem( c ), p( location ), dragging(false), region(NULL) {
+
+		for(int i = 0; i < 6; i++)
+			data[i] = 0.0f;
 
 		if( dragEnabled ) {
 			dragging = dragEnabled;

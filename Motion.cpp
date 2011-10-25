@@ -221,7 +221,7 @@ void Motion::draw( unsigned frame, bool applyRoot ) const {
 	glLineWidth(3.0);
 
 	// Draw motion path
-	if(!applyRoot)
+	//if(!applyRoot)
 	{
 		glColor4dv(COLOR_MOTION_PATH);
 		glBegin(GL_LINE_STRIP);
@@ -230,7 +230,7 @@ void Motion::draw( unsigned frame, bool applyRoot ) const {
 			glVertex3f(m_data[i*m_nchannels + 0], m_data[i*m_nchannels + 1], m_data[i*m_nchannels + 2]);
 		}
 		glEnd();
-	}
+	}//*/
 
 	glColor4dv(COLOR_MOTION);
 
@@ -238,14 +238,14 @@ void Motion::draw( unsigned frame, bool applyRoot ) const {
 	glLineWidth( 3.0 );
 
 	//Facing direction vector
-	/*glPushMatrix(); {
+	glPushMatrix(); {
 		glRotatef( getFacing( frame ), 0.0f, 1.0f, 0.0f );
 
 		glBegin( GL_LINES );
 		  glVertex3f(0.0f, 0.0f, 0.0f);
 		  glVertex3f(0.0f, 0.0f, 12.0f);
 		glEnd();
-	} glPopMatrix();*/
+	} glPopMatrix();
 
 	glPushMatrix(); {
 		m_root->draw(m_data + frame * m_nchannels);
@@ -255,7 +255,6 @@ void Motion::draw( unsigned frame, bool applyRoot ) const {
 void Motion::drawPose(unsigned frame) const 
 {
 	if( frame >= getFrameCount() ) {
-		fprintf(stderr, "Warning: tried to print invalid frame %d.\n", frame);
 		return;
 	}
 
@@ -338,7 +337,6 @@ void Motion::operator +=(const Motion &appendMotion)
 		return;
 	}
 
-	//Copy data over
     float *m_data2 = new float[ ( m_nframes + appendMotion.m_nframes ) * m_nchannels ];
 	float *m_faceDir2 = new float[ m_nframes + appendMotion.m_nframes ];
 
@@ -365,7 +363,7 @@ void Motion::operator +=(const Motion &appendMotion)
 	for( unsigned f = 0; f < appendMotion.m_nframes; f++ )
 	{
 		//blend weights of the motions
-		float wBlend2 = min(1.0f, (float)f/nBlendFrames);
+		float wBlend2 = sin((M_PI/2) * min(1.0f, ((float)f)/nBlendFrames));
 		float wBlend1 = 1.0f - wBlend2;
 		
 		//UPDATE GLOBAL TRANSLATION
@@ -374,7 +372,7 @@ void Motion::operator +=(const Motion &appendMotion)
 		{
         float x = appendMotion.m_data[appendMotion.m_nchannels*f+2];
 		float z = appendMotion.m_data[appendMotion.m_nchannels*f];
-		float theta = deg2rad(endFaceDir+180);
+		float theta = deg2rad(endFaceDir);
 		
 		m_data2[m_nchannels*(m_nframes + f - nBlendFrames) + 2] = endX + x*cos(theta) - z*sin(theta); //+v[0]*cos(theta) + v[1]*sin(theta);
 		m_data2[m_nchannels*(m_nframes + f - nBlendFrames)] = endZ + x*sin(theta) + z*cos(theta); //- v[0]*sin(theta) + v[1]*cos(theta);
@@ -387,7 +385,7 @@ void Motion::operator +=(const Motion &appendMotion)
 
 		//UPDATE GLOBAL ORIENTATION
 		float x, y, z;
-		if(0)//f < nBlendFrames)
+		if(f < nBlendFrames)
 		{
 			z = wBlend2*appendMotion.m_data[appendMotion.m_nchannels*f + 3] + wBlend1*m_data[m_nchannels*(m_nframes - nBlendFrames + f) + 3];
 			y = wBlend2*appendMotion.m_data[appendMotion.m_nchannels*f + 4] + wBlend1*m_data[m_nchannels*(m_nframes - nBlendFrames + f) + 4];
@@ -405,7 +403,7 @@ void Motion::operator +=(const Motion &appendMotion)
 		glPushMatrix();
 		glLoadIdentity();
 
-		glRotatef(endFaceDir + 180, 0.0f, 1.0f, 0.0f);
+		glRotatef(endFaceDir - appendMotion.getFacing(0), 0.0f, 1.0f, 0.0f);
 
 		glRotatef(z, 0.0f, 0.0f, 1.0f); //could write an optimized function for euler->matrix
 		glRotatef(y, 0.0f, 1.0f, 0.0f);
@@ -427,7 +425,7 @@ void Motion::operator +=(const Motion &appendMotion)
 			if(f < nBlendFrames)
 			{
 				float appendMotionComponent = wBlend2 * appendMotion.m_data[appendMotion.m_nchannels*f + c];
-				float startMotionComponent = wBlend1*m_data[m_nchannels*(m_nframes - nBlendFrames + f) + c];
+				float startMotionComponent = wBlend1 * m_data[m_nchannels*(m_nframes - nBlendFrames + f) + c];
 
 				m_data2[m_nchannels*(m_nframes + f - nBlendFrames) + c] = startMotionComponent + appendMotionComponent;
 			}

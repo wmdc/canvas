@@ -228,36 +228,20 @@ float BVHJoint::getFaceDir(float *frameData)
 void BVHJoint::draw(float *frameData, bool translate) const
 {
 	glPushMatrix(); 
-	int nc = 0;       // number of channels already processed
-
-	//vertex at root?
-	/*glBegin( GL_POINTS ); {
-		glVertex3f( 0.0f, 0.0f, 0.0f );
-	} glEnd();*/
-
-	// draw line from parent joint to current joint
-	glBegin(GL_LINES);
-	glVertex3f(0,0,0);
-	glVertex3f(offset[0],offset[1],offset[2]);
-	glEnd();
+	int nc = 0;
 
     // apply joint offset (zero for the root joint)
 	glTranslatef(offset[0],offset[1],offset[2]);
 
-	// Apply corrective rotation about Y-axis.
-	//glRotatef(rY, 0.0f, 1.0f, 0.0f);
-
-	
-	// apply translation channels (typically only for root joint)
 	float x = (translate && transJoint) ? frameData[chOffset] : 0.0f;
 	float y = transJoint ? frameData[chOffset+1] : 0.0f;
 	float z = (translate && transJoint) ? frameData[chOffset+2] : 0.0f;
 		
 	glTranslatef(x,y,z);
+
 	nc += 3;
 
-
-	  // apply Euler rotations, in order specified by skeleton
+	// apply Euler rotations in order specified by skeleton
 	for (int r=nc; r<nchannels; r++) {
 		float th = frameData[chOffset+r];  // theta 
 		switch(chtype[r][0]) {
@@ -276,19 +260,18 @@ void BVHJoint::draw(float *frameData, bool translate) const
 		}
 	}
 	
-	  // draw line from joint to end site (if necessary)
 	if (endSite) {
-		//glLineWidth(3);
-		//glColor3f(0.8,0.4,0);
 		glBegin(GL_LINES);
 		glVertex3f(0,0,0);
 		glVertex3f(endLength[0],endLength[1],endLength[2]);
 		glEnd();
 	}
 
-	  // recursively draw all child joints
 	for (int n=0; n<nchildren; n++)
+	{
 		child[n]->drawChild(frameData);
+	}
+
 	glPopMatrix();
 }
 
