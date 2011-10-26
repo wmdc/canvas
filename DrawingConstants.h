@@ -53,7 +53,7 @@ static const GLdouble COLOR_GRAPH_NODE[4]             = { 0.2, 0.2, 0.4, 1.0 }; 
 static const GLdouble COLOR_POSE[4]                   = { 0.6, 0.6, 0.6, 0.6 };
 static const GLdouble COLOR_POSE_HIGHLIGHT[4]         = { 0.9, 0.9, 0.2, 0.6 };
 
-static const GLdouble COLOR_MOTION[4]				  = { 0.8, 0.8, 0.4, 0.8 };
+static const GLdouble COLOR_MOTION[4]				  = { 0.8, 0.8, 0.4, 0.95 };
 static const GLdouble COLOR_MOTION_PATH[4]            = { 0.1, 0.4, 0.1, 0.5 };
 
 static const GLdouble COLOR_TEXT_ANNOTATION[4]        = { 0.2, 0.2, 0.2, 0.8 };

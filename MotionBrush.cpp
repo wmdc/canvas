@@ -44,7 +44,7 @@ void MotionBrush::drawIcon() const {
 	glLineWidth(2.0);
 	glColor3d( 0.8, 0.8, 0.2 );
 	glPushMatrix(); {
-		static const double SCALE_FACTOR = 0.08;
+		static const double SCALE_FACTOR = 0.36;
 
 		double minDim = min( width, height );
 

@@ -14,6 +14,7 @@
 #include "Point2D.h"
 #include "BoundingBox.h"
 #include "rbf.h"
+#include "CanvasItem.h"
 
 #include <vector>
 #include <ctime>

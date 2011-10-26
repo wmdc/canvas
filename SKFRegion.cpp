@@ -108,10 +108,15 @@ void SKFRegion::mouseDown( int button, Point2D p, bool doubleClick ) {
 			selectionTimes.erase( selectionTimes.begin(), selectionTimes.end() );
 		    selectionPath.push_back( p );
 			selectionTimes.push_back( clock() );
+
 			//delete displayPose;
+
 			displayPose = new CanvasPose( *generatePose( p ), p, *canvas );
 
-			if( button == 1 ) drawingMotion = true;
+			if( button == CanvasItem::MOUSE_BTN_MIDDLE )
+			{
+				drawingMotion = true;
+			}
 		}
 
 		canvas->displayPose( *displayPose );

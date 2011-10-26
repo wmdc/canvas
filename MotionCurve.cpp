@@ -210,7 +210,7 @@ void MotionCurve::mouseDown( int button, Point2D p, bool doubleClick ) {
 				Motion *m = createMotionFromSelection();
 
 				//THIS CREATES A MEMORY LEAK! Don't care for now, but is there a good way to improve this design?
-				if( button == 1 )
+				if( button == MOUSE_BTN_LEFT )
 				{
 				    canvas.animate(*m);
 				}

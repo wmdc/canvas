@@ -2,6 +2,8 @@
 
 #include "Pose.h"
 
+#include "DrawingConstants.h"
+
 Pose::Pose( Motion &m, int frame ) : channelCount( m.getChannelCount() ), skeleton( m.getRoot() ), maxOffset( m.getMaxOffset() ) {
 	data = new float[ channelCount ];
 
@@ -44,11 +46,11 @@ Pose::~Pose() {
 }
 
 void Pose::draw() const {
-	glLineWidth( 2.0 );
-	glPointSize( 2.0 );
+	glLineWidth(3.0f);
+	glPointSize(3.0f);
 
 	glPushMatrix(); {
-		glScalef( 2.0f / maxOffset, 2.0f / maxOffset, 2.0f / maxOffset );
-	    skeleton->draw( data, false );
+		glScalef(3.0f, 3.0f, 3.0f);
+		skeleton->draw( data, false );
 	} glPopMatrix();
 }

@@ -218,8 +218,6 @@ void Motion::draw( unsigned frame, bool applyRoot ) const {
 		return;
 	}
 
-	glLineWidth(3.0);
-
 	// Draw motion path
 	/*//if(!applyRoot)
 	{
@@ -248,6 +246,7 @@ void Motion::draw( unsigned frame, bool applyRoot ) const {
 	} glPopMatrix();*/
 
 	glPushMatrix(); {
+		glScalef(3.0f, 3.0f, 3.0f);
 		m_root->draw(m_data + frame * m_nchannels);
 	} glPopMatrix();
 }

@@ -37,7 +37,8 @@ CanvasPose::CanvasPose( Motion &m, int frame, Point2D location, Canvas &c, bool 
 void CanvasPose::draw() {
 	glPushMatrix(); {
 		glTranslated( p.x, p.y, 0.0 );
-		glScaled( 10.0, 10.0, 1.0 );
+		glColor3d( 0.6, 0.6, 0.6 );
+		//glScaled( 10.0, 10.0, 1.0 );
 
 		glPointSize(CURVE_LINE_WIDTH * 2);
 		glColor4dv( dragging ? COLOR_CURVE_HIGHLIGHT : COLOR_POSE );
@@ -55,7 +56,7 @@ void CanvasPose::draw() {
 void CanvasPose::drawHighlight() {
 	glPushMatrix(); {
 		glTranslated( p.x, p.y, 0.0 );
-		glScaled( 10.0, 10.0, 1.0 );
+		//glScaled( 10.0, 10.0, 1.0 );
 
 		glPointSize(CURVE_LINE_WIDTH * 2);
 		glColor3d( 0.6, 0.1, 0.1 );
