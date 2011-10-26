@@ -48,7 +48,7 @@ void MotionBrush::drawIcon() const {
 
 		double minDim = min( width, height );
 
-		glTranslated( width / 2, 2* height / 5, 0 );
+		glTranslated( width / 2, 3 * height / 5, 0 );
 		glScaled( SCALE_FACTOR * minDim / 12, SCALE_FACTOR * minDim / 12, 0.0 );
 
 		if( hover ) { //animate - what frame?

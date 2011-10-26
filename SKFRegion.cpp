@@ -113,7 +113,7 @@ void SKFRegion::mouseDown( int button, Point2D p, bool doubleClick ) {
 
 			displayPose = new CanvasPose( *generatePose( p ), p, *canvas );
 
-			if( button == CanvasItem::MOUSE_BTN_MIDDLE )
+			if( button == CanvasItem::MOUSE_BTN_RIGHT )
 			{
 				drawingMotion = true;
 			}
