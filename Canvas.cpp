@@ -98,13 +98,15 @@ void Canvas::draw() {
 	glPushMatrix(); {
 		glTranslatef( dOrigin.x, dOrigin.y, 0.0f );
 
+		
+		for( size_t i = 0; i < elements.size(); i++ ) { elements.at(i)->draw(); }
+
 		for( size_t i = 0; i < regions.size(); i++ ) { regions[i]->draw(); }
 
 		if( drawingRegion ) {
 			drawingRegion->draw();
 		}
 
-		for( size_t i = 0; i < elements.size(); i++ ) { elements.at(i)->draw(); }
 
 		for( unsigned i = 0; i < annotations.size(); i++ ) { annotations[i]->draw(); }
 
