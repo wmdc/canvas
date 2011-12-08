@@ -303,7 +303,10 @@ Motion *MotionCurve::createMotionFromSelection() const {
 
 	while(cur)
 	{
-		Motion *m = new Motion(*cur->getMotion(), cur->getHighlightFrame(), cur->getHighlightEndFrame());
+		int beginFrame = cur->neighbourSelectedBefore() ? 0 : cur->getHighlightFrame();
+		int endFrame = cur->neighbourSelectedAfter() ? cur->motion.getFrameCount() : cur->getHighlightEndFrame();
+
+		Motion *m = new Motion(*cur->getMotion(), beginFrame, endFrame);
 
 		if(result == NULL)
 		{

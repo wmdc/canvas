@@ -22,31 +22,29 @@ const int N_GLOBAL_CHANNELS = 3;
 
 Motion::Motion( int nchannels, int nframes, float dt, float maxOffset, BVHJoint *root, float *data, float *faceDir )
 		: m_nchannels( nchannels ), m_nframes( nframes ), m_dt( dt ), 
-	      m_maxOffset( maxOffset ), m_root( root ), m_data( data ), m_faceDir( faceDir ), m_useRoty( false ) {
-			  drawScale = 2.0f / maxOffset;
+	      m_maxOffset( maxOffset ), m_root( root ), m_useRoty( false ) {
 
-			  label = string("");
+	drawScale = 2.0f / maxOffset;
+	label = string("");
+	m_rate = 1.0 / dt;
 
-			  m_rate = 1.0 / dt;
-
+	m_data = new float[m_nchannels * nframes];
+	m_faceDir = new float[m_nframes];
 
 	// Processing the data : make sure we start at the origin
-	float initFaceDir = m_faceDir[0];
-
-	float initPosOri[N_ROOT_TRANS_CHANNELS];
-
-	for( unsigned channel = 0; channel < N_ROOT_TRANS_CHANNELS; channel++ )
-	{
-		initPosOri[channel] = m_data[channel];
-	}
+	float initPos[3] = {data[0], data[1], data[2]};
 
 	for( unsigned frame = 0; frame < m_nframes; frame++ )
 	{
-		m_faceDir[frame] -= initFaceDir;
+		m_faceDir[frame] = faceDir[frame];
 
-		for( unsigned channel = 0; channel < N_ROOT_TRANS_CHANNELS; channel++ )
+		m_data[frame * m_nchannels] = data[frame * m_nchannels] - initPos[0];
+		m_data[frame * m_nchannels + 1] = data[frame * m_nchannels + 1] - initPos[1];
+		m_data[frame * m_nchannels + 2] = data[frame * m_nchannels + 2] - initPos[2];
+
+		for( unsigned channel = 3; channel < m_nchannels; channel++ )
 		{
-			m_data[frame * m_nchannels + channel] -= initPosOri[channel];
+			m_data[frame * m_nchannels + channel] =  data[frame * m_nchannels + channel];
 		}
 	}
 }
@@ -371,7 +369,7 @@ void Motion::operator +=(const Motion &appendMotion)
 		{
         float x = appendMotion.m_data[appendMotion.m_nchannels*f+2];
 		float z = appendMotion.m_data[appendMotion.m_nchannels*f];
-		float theta = deg2rad(endFaceDir);
+		float theta = deg2rad(endFaceDir - 90);
 		
 		m_data2[m_nchannels*(m_nframes + f - nBlendFrames) + 2] = endX + x*cos(theta) - z*sin(theta); //+v[0]*cos(theta) + v[1]*sin(theta);
 		m_data2[m_nchannels*(m_nframes + f - nBlendFrames)] = endZ + x*sin(theta) + z*cos(theta); //- v[0]*sin(theta) + v[1]*cos(theta);
@@ -384,23 +382,42 @@ void Motion::operator +=(const Motion &appendMotion)
 
 		//UPDATE GLOBAL ORIENTATION
 		float x, y, z;
-		if(f < nBlendFrames)
+
+		float a[3] = {appendMotion.m_data[appendMotion.m_nchannels*f + 3], 
+			          appendMotion.m_data[appendMotion.m_nchannels*f + 4], 
+					  appendMotion.m_data[appendMotion.m_nchannels*f + 5]};
+
+		float b[3] = {m_data[m_nchannels*(m_nframes - nBlendFrames + f) + 3],
+					  m_data[m_nchannels*(m_nframes - nBlendFrames + f) + 4],
+					  m_data[m_nchannels*(m_nframes - nBlendFrames + f) + 5]};
+
+		for( int i = 0; i < 3; i++ )
 		{
-			z = wBlend2*appendMotion.m_data[appendMotion.m_nchannels*f + 3] + wBlend1*m_data[m_nchannels*(m_nframes - nBlendFrames + f) + 3];
-			y = wBlend2*appendMotion.m_data[appendMotion.m_nchannels*f + 4] + wBlend1*m_data[m_nchannels*(m_nframes - nBlendFrames + f) + 4];
-			x = wBlend2*appendMotion.m_data[appendMotion.m_nchannels*f + 5] + wBlend1*m_data[m_nchannels*(m_nframes - nBlendFrames + f) + 5];
+			if(abs(a[i]) - abs(b[i]) > 180)
+			{
+				b[i] -= 360;
+			}
 		}
-		else
+
+		/*if(f < nBlendFrames)
 		{
-		    z = appendMotion.m_data[appendMotion.m_nchannels*f + 3];
-		    y = appendMotion.m_data[appendMotion.m_nchannels*f + 4];
-		    x = appendMotion.m_data[appendMotion.m_nchannels*f + 5];
+			z = wBlend2*a[0] + wBlend1*b[0];
+			y = wBlend2*a[1] + wBlend1*b[1];
+			x = wBlend2*a[2] + wBlend1*b[2];
+		}
+		else*/
+		{
+		    z = a[0];
+		    y = a[1];
+		    x = a[2];
 		}
 
 		float m[16];
 		
 		glPushMatrix();
 		glLoadIdentity();
+
+		printf(" %f %f %f  \n", endFaceDir, appendMotion.getFacing(0), endFaceDir - appendMotion.getFacing(0));
 
 		glRotatef(endFaceDir - appendMotion.getFacing(0), 0.0f, 1.0f, 0.0f);
 
