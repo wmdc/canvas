@@ -1,5 +1,1 @@
 This is the source code for my Animation Canvas project, dumped in unceremoniously in poor order.
-
-To do:
-  -organize the code a little more, adding some directories probably.
-  -go through and clean up the code considerably. There's a ton of mess in terms of poor use of pointers vs. references and then a lot of other stuff that is poorly structured because it was modified over time.
